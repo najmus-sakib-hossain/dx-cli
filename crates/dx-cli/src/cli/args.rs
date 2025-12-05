@@ -38,6 +38,8 @@ pub enum Commands {
     Chat(ChatCommand),
     Agent(AgentCommand),
     Shell(ShellCommand),
+    /// Launch the interactive terminal UI
+    Tui,
     Completions { shell: clap_complete::Shell },
 }
 

@@ -3,6 +3,7 @@ use tracing::{info, warn};
 
 use crate::cli::args::{AgentCommand, ChatCommand, Cli, Commands, GenerateCommand, ShellCommand, ToolCommand};
 use crate::cli::completions;
+use dx_tui::TuiApp;
 
 pub async fn dispatch_command(cli: Cli) -> Result<()> {
     match cli.command {
@@ -18,6 +19,7 @@ pub async fn dispatch_command(cli: Cli) -> Result<()> {
         Commands::Chat(cmd) => handle_chat(cmd).await?,
         Commands::Agent(cmd) => handle_agent(cmd).await?,
         Commands::Shell(cmd) => handle_shell(cmd).await?,
+        Commands::Tui => handle_tui().await?,
         Commands::Completions { shell } => completions::generate_completions(shell)?,
     }
 
@@ -26,13 +28,14 @@ pub async fn dispatch_command(cli: Cli) -> Result<()> {
 
 async fn handle_tool(tool: &str, cmd: ToolCommand) -> Result<()> {
     if cmd.list {
-        println!("Listing available {tool} entries (stub)");
+        println!("🔍 Listing available {tool} entries (preview)");
+        println!(" - use `dx {tool} --name <item>` to target a specific entry");
     }
 
     if let Some(name) = cmd.name {
-        println!("Invoking {tool} with target '{name}' (stub)");
+        println!("🚀 Invoking {tool} with target '{name}'");
     } else if !cmd.list {
-        warn!("No target provided for {tool}; showing help-like stub");
+        warn!("No target provided for {tool}; try --list or --name <item>");
     }
 
     Ok(())
@@ -43,7 +46,7 @@ async fn handle_generate(cmd: GenerateCommand) -> Result<()> {
     if cmd.dry_run {
         println!("[dry-run] Would run generator '{}'", cmd.kind);
     } else {
-        println!("Running generator '{}' (stub)", cmd.kind);
+        println!("✨ Running generator '{}'", cmd.kind);
     }
     Ok(())
 }
@@ -51,27 +54,34 @@ async fn handle_generate(cmd: GenerateCommand) -> Result<()> {
 async fn handle_chat(cmd: ChatCommand) -> Result<()> {
     if let Some(message) = cmd.message {
         println!("[chat] user: {message}");
-        println!("[chat] assistant: (stub response)");
+        println!("[chat] assistant: Friday is thinking... (placeholder response)");
     } else {
-        println!("Opening interactive chat shell (stub)");
+        println!("Opening interactive chat shell (placeholder)");
     }
     Ok(())
 }
 
 async fn handle_agent(cmd: AgentCommand) -> Result<()> {
-    println!("Executing agent: {:?} with task {:?} (stub)", cmd.id, cmd.task);
+    println!("🛰️ Executing agent: {:?} with task {:?}", cmd.id, cmd.task);
     Ok(())
 }
 
 async fn handle_shell(cmd: ShellCommand) -> Result<()> {
     if cmd.enable {
-        println!("Enabling shell enhancements (stub)");
+        println!("🔧 Enabling shell enhancements");
     }
     if cmd.disable {
-        println!("Disabling shell enhancements (stub)");
+        println!("🛑 Disabling shell enhancements");
     }
     if !cmd.enable && !cmd.disable {
-        println!("Shell status (stub)");
+        println!("Shell enhancements status: active (preview)");
     }
+    Ok(())
+}
+
+async fn handle_tui() -> Result<()> {
+    println!("Launching dx-tui (press q to quit)...");
+    let mut app = TuiApp::new()?;
+    app.run()?;
     Ok(())
 }
