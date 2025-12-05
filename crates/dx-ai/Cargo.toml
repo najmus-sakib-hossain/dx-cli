@@ -1,0 +1,15 @@
+[package]
+name = "dx-ai"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+futures.workspace = true
+tokio.workspace = true
+reqwest.workspace = true
+tokio-tungstenite.workspace = true
+tracing.workspace = true
+anyhow.workspace = true

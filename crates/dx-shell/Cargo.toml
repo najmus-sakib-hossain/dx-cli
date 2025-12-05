@@ -1,0 +1,13 @@
+[package]
+name = "dx-shell"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde.workspace = true
+rustyline.workspace = true
+nucleo.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+sled.workspace = true
+shell-words.workspace = true

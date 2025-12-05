@@ -1,0 +1,32 @@
+[package]
+name = "dx-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dx-core.workspace = true
+dx-tui.workspace = true
+dx-ai.workspace = true
+dx-generator.workspace = true
+dx-shell.workspace = true
+dx-forge.workspace = true
+dx-style.workspace = true
+dx-ui.workspace = true
+dx-icons.workspace = true
+dx-fonts.workspace = true
+dx-auth.workspace = true
+dx-media.workspace = true
+dx-i18n.workspace = true
+dx-lsp.workspace = true
+
+clap.workspace = true
+clap_complete.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+console.workspace = true
+indicatif.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+once_cell.workspace = true

@@ -1,0 +1,8 @@
+[advisories]
+db-path = "~/.cargo/advisory-db"
+
+[licenses]
+allow = ["MIT", "Apache-2.0", "Unicode-DFS-2016"]
+
+[sources]
+deny-git = []

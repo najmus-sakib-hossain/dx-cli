@@ -1,6 +1,144 @@
-[package]
-name = "dx-cli"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "2"
+members = [
+	"crates/*",
+	"xtask",
+]
 
-[dependencies]
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dx-platform/dx-cli"
+homepage = "https://dx.dev"
+documentation = "https://docs.dx.dev"
+authors = ["Dx Team"]
+keywords = ["cli", "developer-tools", "ai", "productivity"]
+categories = ["command-line-utilities", "development-tools"]
+
+[workspace.dependencies]
+# Internal crates
+dx-core = { path = "crates/dx-core" }
+dx-cli = { path = "crates/dx-cli" }
+dx-tui = { path = "crates/dx-tui" }
+dx-ai = { path = "crates/dx-ai" }
+dx-generator = { path = "crates/dx-generator" }
+dx-shell = { path = "crates/dx-shell" }
+dx-forge = { path = "crates/dx-forge" }
+dx-style = { path = "crates/dx-style" }
+dx-ui = { path = "crates/dx-ui" }
+dx-icons = { path = "crates/dx-icons" }
+dx-fonts = { path = "crates/dx-fonts" }
+dx-auth = { path = "crates/dx-auth" }
+dx-media = { path = "crates/dx-media" }
+dx-i18n = { path = "crates/dx-i18n" }
+dx-lsp = { path = "crates/dx-lsp" }
+
+# CLI & TUI
+clap = { version = "4.5", features = ["derive", "env", "unicode", "wrap_help"] }
+clap_complete = "4.5"
+ratatui = { version = "0.29", features = ["all-widgets"] }
+crossterm = { version = "0.28", features = ["event-stream"] }
+indicatif = { version = "0.17", features = ["rayon", "tokio"] }
+console = "0.15"
+dialoguer = { version = "0.11", features = ["fuzzy-select"] }
+
+# Async
+tokio = { version = "1.40", features = ["full", "tracing"] }
+tokio-util = { version = "0.7", features = ["full"] }
+futures = "0.3"
+async-trait = "0.1"
+rayon = "1.10"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+serde_yaml = "0.9"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+
+# HTTP
+reqwest = { version = "0.12", features = ["json", "stream", "gzip", "brotli"] }
+tokio-tungstenite = { version = "0.24", features = ["native-tls"] }
+
+# File system
+walkdir = "2.5"
+notify = { version = "6.1", features = ["serde"] }
+dirs = "5.0"
+tempfile = "3.12"
+glob = "0.3"
+
+# Templates
+tera = "1.20"
+minijinja = { version = "2.3", features = ["loader"] }
+
+# Database
+sled = "0.34"
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# Shell
+rustyline = { version = "14.0", features = ["derive"] }
+nucleo = "0.5"
+shell-words = "1.1"
+
+# Utilities
+once_cell = "1.20"
+derive_builder = "0.20"
+strum = { version = "0.26", features = ["derive"] }
+itertools = "0.13"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.10", features = ["v4", "v7", "serde"] }
+regex = "1.11"
+url = "2.5"
+semver = { version = "1.0", features = ["serde"] }
+which = "6.0"
+humantime = "2.1"
+bytesize = "1.3"
+
+# Compression
+flate2 = "1.0"
+zip = "2.2"
+tar = "0.4"
+base64 = "0.22"
+blake3 = "1.5"
+sha2 = "0.10"
+
+# Testing
+tokio-test = "0.4"
+assert_cmd = "2.0"
+predicates = "3.1"
+insta = { version = "1.40", features = ["yaml"] }
+criterion = { version = "0.5", features = ["async_tokio"] }
+fake = "2.10"
+mockall = "0.13"
+wiremock = "0.6"
+
+# LSP
+tower-lsp = "0.20"
+lsp-types = "0.97"
+tree-sitter = "0.23"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.dev.package."*"]
+opt-level = 3
+
+
+
