@@ -19,7 +19,6 @@ const MAX_LOG_LINES: usize = 120;
 struct CommandItem {
     name: &'static str,
     description: &'static str,
-    hint: &'static str,
 }
 
 #[derive(Debug)]
@@ -47,7 +46,7 @@ impl AppState {
             selected: 0,
             input: String::new(),
             logs: VecDeque::with_capacity(MAX_LOG_LINES),
-            status: "Type a command or press Enter to run the highlighted one".to_string(),
+            status: "Ready to execute commands".to_string(),
         }
     }
 
@@ -128,7 +127,7 @@ impl TuiApp {
             KeyCode::Tab => {
                 if let Some(item) = self.state.commands.get(self.state.selected) {
                     self.state.input = item.name.to_string();
-                    self.state.status = format!("Staged '{}'; press Enter to run", item.name);
+                    self.state.status = format!("Staged: {}", item.name);
                 }
             }
             KeyCode::Backspace => {
@@ -142,11 +141,11 @@ impl TuiApp {
                 self.execute_current();
             }
             KeyCode::Char('?') => {
-                self.state.status = "Shortcuts: ↑/↓ navigate · Tab stage command · Enter run · Ctrl+C/q exit".into();
+                self.state.status = "Navigation: ↑↓ | Stage: Tab | Execute: Enter | Quit: q".into();
             }
             KeyCode::Char('k') if key.modifiers.contains(KeyModifiers::CONTROL) => {
                 self.state.logs.clear();
-                self.state.status = "Cleared activity log".into();
+                self.state.status = "Activity log cleared".into();
             }
             KeyCode::Char(ch) => {
                 self.state.input.push(ch);
@@ -166,12 +165,12 @@ impl TuiApp {
         }
 
         if cmd.is_empty() {
-            self.state.status = "Nothing to run".into();
+            self.state.status = "No command to execute".into();
             return;
         }
 
-        self.state.log(format!("→ {cmd}"));
-        self.state.status = format!("Running '{cmd}'");
+        self.state.log(format!("→{cmd}"));
+        self.state.status = format!("Executing: {cmd}");
 
         let response = synthetic_execute(&cmd);
 
@@ -408,67 +407,54 @@ fn default_commands() -> Vec<CommandItem> {
         CommandItem {
             name: "ui list",
             description: "Browse available UI components",
-            hint: "dx ui --list",
         },
         CommandItem {
             name: "style compile",
             description: "Compile styles with optimizer",
-            hint: "dx style --name base.css",
         },
         CommandItem {
             name: "icon fetch",
             description: "Sync icon sets (lucide, heroicons)",
-            hint: "dx icon --list",
         },
         CommandItem {
             name: "font install",
             description: "Install curated font packs",
-            hint: "dx font --name inter",
         },
         CommandItem {
             name: "auth configure",
             description: "Set up auth providers",
-            hint: "dx auth --name github",
         },
         CommandItem {
             name: "media optimize",
             description: "Optimize media assets",
-            hint: "dx media --name assets/hero.png",
         },
         CommandItem {
             name: "i18n generate",
             description: "Generate localization bundles",
-            hint: "dx i18n --list",
         },
         CommandItem {
             name: "forge status",
             description: "Check VCS pipeline state",
-            hint: "dx forge --list",
         },
         CommandItem {
             name: "generate project",
             description: "Start a new project from template",
-            hint: "dx generate --kind project",
         },
         CommandItem {
             name: "generate component button",
             description: "Scaffold a UI component",
-            hint: "dx generate --kind component --template button",
         },
         CommandItem {
             name: "chat hello",
             description: "Ping Friday AI",
-            hint: "dx chat --message 'hello'",
         },
         CommandItem {
             name: "agent run",
             description: "Execute an agent task",
-            hint: "dx agent --task 'analyze repo'",
         },
         CommandItem {
             name: "shell status",
             description: "Show shell enhancement status",
-            hint: "dx shell",
         },
     ]
 }
