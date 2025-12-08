@@ -13,10 +13,18 @@ use crate::cli::commands::dispatch_command;
 pub async fn run() -> anyhow::Result<()> {
     setup_tracing();
 
-    let cli = Cli::parse();
-    crate::banner::print();
-
-    dispatch_command(cli).await?;
+    let cli = Cli::try_parse();
+    
+    match cli {
+        Ok(cli) => {
+            crate::banner::print();
+            dispatch_command(cli).await?;
+        }
+        Err(e) => {
+            // Print help/error and exit with appropriate code
+            e.exit();
+        }
+    }
 
     Ok(())
 }
