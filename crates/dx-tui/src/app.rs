@@ -226,24 +226,25 @@ impl Drop for TuiApp {
 
 fn render_header(frame: &mut ratatui::Frame<'_>, area: Rect) {
     let title = Line::from(vec![
-        Span::styled(" DX ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD | Modifier::REVERSED)),
-        Span::raw("  Enhanced Development Experience "),
+        Span::styled("DX", Style::default().fg(Color::White).add_modifier(Modifier::BOLD)),
+        Span::styled(" /", Style::default().fg(Color::Rgb(64, 64, 64))),
+        Span::styled(" Enhanced Development Experience", Style::default().fg(Color::Rgb(160, 160, 160))),
     ]);
 
     let subtitle = Line::from(vec![
-        Span::styled("⚡ Fast", Style::default().fg(Color::Green)),
-        Span::raw(" · "),
-        Span::styled("🤖 AI-first", Style::default().fg(Color::Magenta)),
-        Span::raw(" · "),
-        Span::styled("Transparent", Style::default().fg(Color::Yellow)),
+        Span::styled("Fast", Style::default().fg(Color::Rgb(0, 112, 243))),
+        Span::styled(" • ", Style::default().fg(Color::Rgb(64, 64, 64))),
+        Span::styled("AI-First", Style::default().fg(Color::Rgb(0, 112, 243))),
+        Span::styled(" • ", Style::default().fg(Color::Rgb(64, 64, 64))),
+        Span::styled("Transparent", Style::default().fg(Color::Rgb(0, 112, 243))),
     ]);
 
-    let header = Paragraph::new(vec![title, subtitle])
+    let header = Paragraph::new(vec![Line::raw(""), title, subtitle])
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .title(Span::styled("dx-tui", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))),
+                .border_type(BorderType::Plain)
+                .border_style(Style::default().fg(Color::Rgb(48, 48, 48))),
         )
         .alignment(ratatui::layout::Alignment::Center);
 
@@ -273,9 +274,15 @@ fn render_palette(frame: &mut ratatui::Frame<'_>, area: Rect, state: &RenderStat
         .iter()
         .map(|cmd| {
             ListItem::new(vec![
-                Line::from(Span::styled(cmd.name, Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))),
-                Line::from(Span::styled(cmd.description, Style::default().fg(Color::Gray))),
-                Line::from(Span::styled(cmd.hint, Style::default().fg(Color::DarkGray))),
+                Line::from(vec![
+                    Span::styled("  ", Style::default()),
+                    Span::styled(cmd.name, Style::default().fg(Color::White).add_modifier(Modifier::BOLD)),
+                ]),
+                Line::from(vec![
+                    Span::styled("  ", Style::default()),
+                    Span::styled(cmd.description, Style::default().fg(Color::Rgb(128, 128, 128))),
+                ]),
+                Line::raw(""),
             ])
         })
         .collect();
@@ -284,17 +291,18 @@ fn render_palette(frame: &mut ratatui::Frame<'_>, area: Rect, state: &RenderStat
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .title(Span::styled("Command palette", Style::default().fg(Color::Green)))
+                .border_type(BorderType::Plain)
+                .border_style(Style::default().fg(Color::Rgb(48, 48, 48)))
+                .title(Span::styled(" Commands ", Style::default().fg(Color::Rgb(160, 160, 160))))
                 .title_alignment(ratatui::layout::Alignment::Left),
         )
         .highlight_style(
             Style::default()
-                .fg(Color::Black)
-                .bg(Color::Cyan)
+                .fg(Color::White)
+                .bg(Color::Rgb(0, 112, 243))
                 .add_modifier(Modifier::BOLD),
         )
-        .highlight_symbol("❯ ")
+        .highlight_symbol("▶ ")
         .repeat_highlight_symbol(true)
         .highlight_spacing(HighlightSpacing::Always);
 
@@ -313,35 +321,55 @@ fn render_logs(frame: &mut ratatui::Frame<'_>, area: Rect, state: &RenderState) 
         .rev()
         .take(50)
         .rev()
-        .map(|entry| Line::from(Span::raw(entry.clone())))
+        .map(|entry| {
+            let styled = if entry.starts_with('→') {
+                Line::from(vec![
+                    Span::styled("  → ", Style::default().fg(Color::Rgb(0, 112, 243))),
+                    Span::raw(entry.trim_start_matches('→').trim()),
+                ])
+            } else if entry.contains('✓') {
+                Line::from(vec![
+                    Span::styled("  ✓ ", Style::default().fg(Color::Rgb(0, 200, 0))),
+                    Span::raw(entry.trim_start_matches('✓').trim()),
+                ])
+            } else {
+                Line::from(vec![
+                    Span::styled("    ", Style::default()),
+                    Span::raw(entry.clone()),
+                ])
+            };
+            styled
+        })
         .collect();
 
     let paragraph = Paragraph::new(lines)
         .wrap(Wrap { trim: true })
         .block(
             Block::default()
-                .title(Span::styled("Activity", Style::default().fg(Color::Magenta)))
+                .title(Span::styled(" Activity ", Style::default().fg(Color::Rgb(160, 160, 160))))
                 .borders(Borders::ALL)
-                .border_type(BorderType::Rounded),
+                .border_type(BorderType::Plain)
+                .border_style(Style::default().fg(Color::Rgb(48, 48, 48))),
         );
 
     frame.render_widget(paragraph, area);
 }
 
 fn render_input(frame: &mut ratatui::Frame<'_>, area: Rect, state: &RenderState) {
-    let cursor = Span::styled("▌", Style::default().fg(Color::Yellow));
+    let cursor = Span::styled("│", Style::default().fg(Color::Rgb(0, 112, 243)));
     let content = Line::from(vec![
-        Span::styled("❯ ", Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
-        Span::raw(&state.input),
+        Span::styled(" $ ", Style::default().fg(Color::Rgb(0, 112, 243)).add_modifier(Modifier::BOLD)),
+        Span::styled(&state.input, Style::default().fg(Color::White)),
         cursor,
     ]);
 
     let paragraph = Paragraph::new(content)
         .block(
             Block::default()
-                .title(Span::styled("Command", Style::default().fg(Color::Blue)))
+                .title(Span::styled(" Input ", Style::default().fg(Color::Rgb(160, 160, 160))))
                 .borders(Borders::ALL)
-                .border_type(BorderType::Rounded),
+                .border_type(BorderType::Plain)
+                .border_style(Style::default().fg(Color::Rgb(48, 48, 48))),
         );
 
     frame.render_widget(paragraph, area);
@@ -349,23 +377,27 @@ fn render_input(frame: &mut ratatui::Frame<'_>, area: Rect, state: &RenderState)
 
 fn render_footer(frame: &mut ratatui::Frame<'_>, area: Rect, state: &RenderState) {
     let hints = Line::from(vec![
-        Span::styled("↑/↓", Style::default().fg(Color::Cyan)),
-        Span::raw(" move  "),
-        Span::styled("Tab", Style::default().fg(Color::Green)),
-        Span::raw(" stage  "),
-        Span::styled("Enter", Style::default().fg(Color::Yellow)),
-        Span::raw(" run  "),
-        Span::styled("Ctrl+C/q", Style::default().fg(Color::Red)),
-        Span::raw(" quit"),
+        Span::styled("[↑↓]", Style::default().fg(Color::Rgb(128, 128, 128))),
+        Span::raw(" Navigate  "),
+        Span::styled("[Tab]", Style::default().fg(Color::Rgb(128, 128, 128))),
+        Span::raw(" Stage  "),
+        Span::styled("[Enter]", Style::default().fg(Color::Rgb(128, 128, 128))),
+        Span::raw(" Execute  "),
+        Span::styled("[q]", Style::default().fg(Color::Rgb(128, 128, 128))),
+        Span::raw(" Quit"),
     ]);
 
-    let status = Paragraph::new(vec![Line::from(state.status.clone()), hints])
+    let status_line = Line::from(vec![
+        Span::styled("● ", Style::default().fg(Color::Rgb(0, 200, 0))),
+        Span::styled(&state.status, Style::default().fg(Color::Rgb(200, 200, 200))),
+    ]);
+
+    let status = Paragraph::new(vec![status_line, hints])
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .title(Span::styled("Status", Style::default().fg(Color::Yellow)))
-                .title_alignment(ratatui::layout::Alignment::Left),
+                .border_type(BorderType::Plain)
+                .border_style(Style::default().fg(Color::Rgb(48, 48, 48))),
         );
 
     frame.render_widget(status, area);
@@ -446,31 +478,31 @@ fn synthetic_execute(command: &str) -> Vec<String> {
 
     let mut lines = Vec::new();
     if trimmed.starts_with("ui") {
-        lines.push("✓ UI toolkit ready — components: button, accordion, modal".to_string());
+        lines.push("✓UI toolkit ready — components: button, accordion, modal".to_string());
     } else if trimmed.starts_with("style") {
-        lines.push("✓ Styles compiled with minify=true".to_string());
+        lines.push("✓Styles compiled with minify=true".to_string());
     } else if trimmed.starts_with("icon") {
-        lines.push("✓ Icon sets synced (lucide, heroicons)".to_string());
+        lines.push("✓Icon sets synced (lucide, heroicons)".to_string());
     } else if trimmed.starts_with("font") {
-        lines.push("✓ Fonts installed to public/fonts".to_string());
+        lines.push("✓Fonts installed to public/fonts".to_string());
     } else if trimmed.starts_with("auth") {
-        lines.push("✓ Auth provider configured; secrets stored securely".to_string());
+        lines.push("✓Auth provider configured; secrets stored securely".to_string());
     } else if trimmed.starts_with("media") {
-        lines.push("✓ Media optimized; saved 32% disk".to_string());
+        lines.push("✓Media optimized; saved 32% disk".to_string());
     } else if trimmed.starts_with("i18n") {
-        lines.push("✓ Localization bundles generated for en/es/fr".to_string());
+        lines.push("✓Localization bundles generated for en/es/fr".to_string());
     } else if trimmed.starts_with("forge") {
-        lines.push("✓ Forge pipeline healthy; branch dx/main clean".to_string());
+        lines.push("✓Forge pipeline healthy; branch dx/main clean".to_string());
     } else if trimmed.starts_with("generate component") {
-        lines.push("✓ Component scaffolded (dry-run)".to_string());
+        lines.push("✓Component scaffolded (dry-run)".to_string());
     } else if trimmed.starts_with("generate") {
-        lines.push("✓ Project template rendered to ./out".to_string());
+        lines.push("✓Project template rendered to ./out".to_string());
     } else if trimmed.starts_with("chat") {
-        lines.push("🤖 Friday: Hey there! Ready to build something great.".to_string());
+        lines.push("✓Friday: Hey there! Ready to build something great.".to_string());
     } else if trimmed.starts_with("agent") {
-        lines.push("🛰️ Agent orchestrator kicked off".to_string());
+        lines.push("✓Agent orchestrator kicked off".to_string());
     } else if trimmed.starts_with("shell") {
-        lines.push("✓ Shell enhancements active (fuzzy, history, ai)".to_string());
+        lines.push("✓Shell enhancements active (fuzzy, history, ai)".to_string());
     } else if trimmed == "clear" {
         lines.push("(log cleared)".to_string());
     } else {
