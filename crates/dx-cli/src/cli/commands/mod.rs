@@ -68,13 +68,39 @@ async fn handle_agent(cmd: AgentCommand) -> Result<()> {
 
 async fn handle_shell(cmd: ShellCommand) -> Result<()> {
     if cmd.enable {
-        println!("🔧 Enabling shell enhancements");
-    }
-    if cmd.disable {
-        println!("🛑 Disabling shell enhancements");
-    }
-    if !cmd.enable && !cmd.disable {
-        println!("Shell enhancements status: active (preview)");
+        dx_shell::enable_shell_enhancements()?;
+        
+        // Auto-install if not already done
+        if let Some(shell_type) = dx_shell::ShellType::detect() {
+            println!("\nDetected shell: {}", shell_type.name());
+            println!("\nTo complete setup, run:");
+            println!("  bash ~/.dx/shell/install.sh");
+        }
+    } else if cmd.disable {
+        dx_shell::disable_shell_enhancements()?;
+    } else {
+        // Show status and install if needed
+        if let Some(shell_type) = dx_shell::ShellType::detect() {
+            println!("Current shell: {}", shell_type.name());
+            println!("\nShell enhancements available:");
+            println!("  • Enhanced ls with file type icons");
+            println!("  • Command help hints (Ctrl+H)");
+            println!("  • Smart autocomplete and history");
+            println!("  • Command suggestions for typos");
+            println!("  • Persistent command memory");
+            println!("\nInstall with: dx shell --enable");
+            
+            // Check if already installed
+            let home = dirs::home_dir().unwrap_or_default();
+            let installed = home.join(".dx/shell/dx-shell-init.sh").exists();
+            
+            if installed {
+                println!("\n✓ Enhancement scripts installed");
+                println!("  Restart your shell to activate");
+            }
+        } else {
+            println!("Could not detect shell type");
+        }
     }
     Ok(())
 }

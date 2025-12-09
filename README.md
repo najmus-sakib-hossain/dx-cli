@@ -9,8 +9,6 @@ Dx-CLI is the Rust-first command-line interface for the Dx platform. This reposi
 	- `cargo build`
 - Run the CLI:
 	- `cargo run -p dx-cli -- --help`
-- Generate completions:
-	- `j`
 
 ## Workspace layout
 

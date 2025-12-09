@@ -11,3 +11,4 @@ anyhow.workspace = true
 tracing.workspace = true
 sled.workspace = true
 shell-words.workspace = true
+dirs.workspace = true
