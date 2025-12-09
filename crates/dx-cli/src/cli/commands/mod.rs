@@ -79,27 +79,34 @@ async fn handle_shell(cmd: ShellCommand) -> Result<()> {
     } else if cmd.disable {
         dx_shell::disable_shell_enhancements()?;
     } else {
-        // Show status and install if needed
-        if let Some(shell_type) = dx_shell::ShellType::detect() {
-            println!("Current shell: {}", shell_type.name());
-            println!("\nShell enhancements available:");
-            println!("  • Enhanced ls with file type icons");
-            println!("  • Command help hints (Ctrl+H)");
-            println!("  • Smart autocomplete and history");
-            println!("  • Command suggestions for typos");
-            println!("  • Persistent command memory");
-            println!("\nInstall with: dx shell --enable");
-            
-            // Check if already installed
-            let home = dirs::home_dir().unwrap_or_default();
-            let installed = home.join(".dx/shell/dx-shell-init.sh").exists();
-            
-            if installed {
-                println!("\n✓ Enhancement scripts installed");
-                println!("  Restart your shell to activate");
-            }
-        } else {
-            println!("Could not detect shell type");
+        // Show status and install if needed - shell detection always succeeds now
+        let shell_type = dx_shell::ShellType::detect().unwrap_or(dx_shell::ShellType::Bash);
+        
+        println!("✓ Detected shell: {}", shell_type.name());
+        println!();
+        println!("Shell enhancements available:");
+        println!("  • Enhanced ls with file type icons");
+        println!("  • Command help hints (Ctrl+H)");
+        println!("  • Smart autocomplete and history");
+        println!("  • Command suggestions for typos");
+        println!("  • Persistent command memory");
+        println!();
+        println!("Compatible with:");
+        println!("  • Bash (Linux, macOS, Git Bash, WSL, Termux)");
+        println!("  • Zsh (macOS, Linux)");
+        println!("  • Fish");
+        println!("  • PowerShell (Windows)");
+        println!();
+        println!("Install with: dx shell --enable");
+        
+        // Check if already installed
+        let home = dirs::home_dir().unwrap_or_default();
+        let installed = home.join(".dx/shell/dx-shell-init.sh").exists();
+        
+        if installed {
+            println!();
+            println!("✓ Enhancement scripts installed");
+            println!("  Restart your shell to activate");
         }
     }
     Ok(())

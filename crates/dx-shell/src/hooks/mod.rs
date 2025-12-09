@@ -7,6 +7,7 @@ const BASH_INIT: &str = include_str!("dx-shell-init.sh");
 const BASH_COMMANDS: &str = include_str!("dx-shell-commands.sh");
 const BASH_MEMORY: &str = include_str!("dx-shell-memory.sh");
 const INSTALL_SCRIPT: &str = include_str!("install.sh");
+const DEMO_SCRIPT: &str = include_str!("demo.sh");
 
 pub fn install_hooks(shell_type: ShellType) -> Result<()> {
     let home = dirs::home_dir().context("Could not find home directory")?;
@@ -22,14 +23,18 @@ pub fn install_hooks(shell_type: ShellType) -> Result<()> {
     fs::write(shell_dir.join("dx-shell-commands.sh"), BASH_COMMANDS)?;
     fs::write(shell_dir.join("dx-shell-memory.sh"), BASH_MEMORY)?;
     fs::write(shell_dir.join("install.sh"), INSTALL_SCRIPT)?;
+    fs::write(shell_dir.join("demo.sh"), DEMO_SCRIPT)?;
     
     // Make scripts executable on Unix
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        let mut perms = fs::metadata(shell_dir.join("install.sh"))?.permissions();
-        perms.set_mode(0o755);
-        fs::set_permissions(shell_dir.join("install.sh"), perms)?;
+        for script in &["install.sh", "demo.sh"] {
+            let path = shell_dir.join(script);
+            let mut perms = fs::metadata(&path)?.permissions();
+            perms.set_mode(0o755);
+            fs::set_permissions(&path, perms)?;
+        }
     }
     
     println!("✓ Shell enhancement scripts installed to: {}", shell_dir.display());
