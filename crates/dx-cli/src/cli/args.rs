@@ -21,7 +21,7 @@ pub struct Cli {
     pub config: Option<String>,
 
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Option<Commands>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -38,9 +38,9 @@ pub enum Commands {
     Chat(ChatCommand),
     Agent(AgentCommand),
     Shell(ShellCommand),
-    /// Launch the interactive terminal UI
-    Tui,
     Completions { shell: clap_complete::Shell },
+    /// Set API configuration
+    Config(ConfigCommand),
 }
 
 #[derive(Args, Debug, Default)]
@@ -96,4 +96,18 @@ pub struct ShellCommand {
     /// Disable shell enhancements
     #[arg(long)]
     pub disable: bool,
+}
+
+#[derive(Args, Debug)]
+pub struct ConfigCommand {
+    #[command(subcommand)]
+    pub action: ConfigAction,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum ConfigAction {
+    /// Set Gemini API key
+    SetApiKey { key: String },
+    /// Get current API key
+    GetApiKey,
 }

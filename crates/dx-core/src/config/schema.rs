@@ -42,6 +42,8 @@ pub struct AiSection {
     pub memory_enabled: bool,
     #[serde(default)]
     pub memory_path: Option<String>,
+    #[serde(default)]
+    pub gemini_api_key: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

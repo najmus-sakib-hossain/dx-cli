@@ -26,6 +26,13 @@ Enhanced Development Experience
 
 ## ✨ Features
 
+### 🤖 **AI Chat Interface** ✅ NEW!
+- 💬 **Interactive AI** - Run `dx` to chat with Google Gemini AI
+- 🎯 **Command Execution** - Run shell/dx commands from chat
+- 🔑 **Free API** - Uses Google Gemini with free tier (1500 requests/day)
+- ⌨️ **Smart Detection** - Auto-detects commands vs AI queries
+- 💾 **Conversation History** - Maintains context during session
+
 ### 🐚 **Intelligent Shell** ✅ WORKING
 - 📄 **Enhanced ls** with file type icons
 - 🔍 **Smart autocomplete** with fuzzy matching
@@ -60,12 +67,25 @@ Enhanced Development Experience
 # Build
 cargo build --release
 
+# Start AI chat (no arguments = interactive chat!)
+./target/release/dx
+# OR
+dx
+
+# Ask AI anything or run commands:
+#   "How do I use tokio?"
+#   "ls -la"
+#   "dx shell --enable"
+
+# Set your own API key (optional, has default)
+dx config set-api-key YOUR_GEMINI_API_KEY
+
 # Install shell enhancements
-./target/release/dx-cli shell --enable
+dx shell --enable
 bash ~/.dx/shell/install.sh
 exec $SHELL
 
-# Try it out!
+# Try enhanced features
 ls              # Enhanced ls with icons
 j dx-cli        # Jump to directory
 h cargo         # Search history
@@ -74,6 +94,23 @@ h cargo         # Search history
 ---
 
 ## 📖 Usage
+
+### AI Chat Interface
+
+```bash
+# Launch interactive AI chat
+dx
+
+# In the chat, you can:
+#   - Ask questions: "How do I create a React component?"
+#   - Run commands: "cargo build"
+#   - Use dx tools: "dx ui add button"
+#   - Exit: Ctrl+C
+
+# Set your own API key
+dx config set-api-key YOUR_KEY
+dx config get-api-key
+```
 
 ### Basic Commands
 ```bash
@@ -130,13 +167,16 @@ Rust 1.93 • Clap 4.5 • Ratatui 0.29 • Tokio 1.42 • Sled 0.34
 - [x] Enhanced shell (ls, autocomplete, memory, navigation)
 - [x] Cross-platform support (Windows/Mac/Linux/Termux)
 
-### 🚧 Phase 3: AI (IN PROGRESS)
-- [ ] Friday AI client & chat interface
-- [ ] Agent orchestrator
+### ✅ Phase 3: AI Integration (COMPLETED)
+- [x] Google Gemini AI client
+- [x] Interactive chat interface
+- [x] Command execution from chat
+- [x] API key management
 
 ### 📋 Phase 4 & 5: Tools (PLANNED)
 - [ ] Code generation (components, projects, docs)
 - [ ] Developer tools (style, ui, icons, fonts, media, i18n, auth)
+- [ ] Agent orchestrator
 
 ---
 

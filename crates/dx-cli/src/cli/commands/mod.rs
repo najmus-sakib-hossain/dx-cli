@@ -1,12 +1,24 @@
 use anyhow::Result;
 use tracing::{info, warn};
 
-use crate::cli::args::{AgentCommand, ChatCommand, Cli, Commands, GenerateCommand, ShellCommand, ToolCommand};
+use crate::cli::args::{AgentCommand, ChatCommand, Cli, Commands, GenerateCommand, ShellCommand, ToolCommand, ConfigCommand, ConfigAction};
 use crate::cli::completions;
-use dx_tui::TuiApp;
+use dx_tui::ChatApp;
+use dx_core::config;
 
 pub async fn dispatch_command(cli: Cli) -> Result<()> {
-    match cli.command {
+    // If no subcommand provided, launch interactive chat
+    let command = match cli.command {
+        Some(cmd) => cmd,
+        None => {
+            // Launch interactive AI chat
+            let config_data = config::load().ok();
+            let mut chat_app = ChatApp::new(config_data);
+            return chat_app.run().await;
+        }
+    };
+
+    match command {
         Commands::Ui(cmd) => handle_tool("ui", cmd).await?,
         Commands::Style(cmd) => handle_tool("style", cmd).await?,
         Commands::Icon(cmd) => handle_tool("icon", cmd).await?,
@@ -19,8 +31,8 @@ pub async fn dispatch_command(cli: Cli) -> Result<()> {
         Commands::Chat(cmd) => handle_chat(cmd).await?,
         Commands::Agent(cmd) => handle_agent(cmd).await?,
         Commands::Shell(cmd) => handle_shell(cmd).await?,
-        Commands::Tui => handle_tui().await?,
         Commands::Completions { shell } => completions::generate_completions(shell)?,
+        Commands::Config(cmd) => handle_config(cmd).await?,
     }
 
     Ok(())
@@ -112,9 +124,42 @@ async fn handle_shell(cmd: ShellCommand) -> Result<()> {
     Ok(())
 }
 
-async fn handle_tui() -> Result<()> {
-    println!("Launching dx-tui (press q to quit)...");
-    let mut app = TuiApp::new()?;
-    app.run()?;
+async fn handle_config(cmd: ConfigCommand) -> Result<()> {
+    let config_dir = dirs::home_dir()
+        .ok_or_else(|| anyhow::anyhow!("Could not find home directory"))?
+        .join(".dx");
+    
+    std::fs::create_dir_all(&config_dir)?;
+    let config_file = config_dir.join("config.toml");
+
+    match cmd.action {
+        ConfigAction::SetApiKey { key } => {
+            // Load existing config or create new
+            let mut config = config::load().unwrap_or_default();
+            config.ai.gemini_api_key = Some(key.clone());
+            
+            // Save config
+            let toml_string = toml::to_string_pretty(&config)?;
+            std::fs::write(&config_file, toml_string)?;
+            
+            println!("✓ Gemini API key saved to: {}", config_file.display());
+            println!("  Key: {}...{}", &key[..8.min(key.len())], &key[key.len().saturating_sub(4)..]);
+        }
+        ConfigAction::GetApiKey => {
+            if let Ok(config) = config::load() {
+                if let Some(key) = config.ai.gemini_api_key {
+                    println!("Gemini API Key: {}...{}", &key[..8.min(key.len())], &key[key.len().saturating_sub(4)..]);
+                } else {
+                    println!("No API key set. Using default key.");
+                    println!("Set your key with: dx config set-api-key <YOUR_KEY>");
+                }
+            } else {
+                println!("No configuration found. Using default API key.");
+                println!("Set your key with: dx config set-api-key <YOUR_KEY>");
+            }
+        }
+    }
+    
     Ok(())
 }
+

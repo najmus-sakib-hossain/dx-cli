@@ -9,3 +9,5 @@ ratatui.workspace = true
 crossterm.workspace = true
 tokio.workspace = true
 tracing.workspace = true
+dx-ai = { path = "../dx-ai" }
+dx-core = { path = "../dx-core" }

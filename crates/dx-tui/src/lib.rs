@@ -6,5 +6,7 @@ pub mod components;
 pub mod layouts;
 pub mod themes;
 pub mod events;
+pub mod chat;
 
 pub use app::TuiApp;
+pub use chat::ChatApp;
